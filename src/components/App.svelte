@@ -7,7 +7,10 @@
   import { Logger } from '~/services/logger.service';
   import { initServices } from '~/web/init-services';
 
-  const { baseUrl, view }: AppProps = $props();
+  const {
+    baseUrl,
+    view,
+  }: AppProps = $props();
 
   onMount(() => {
     Logger.info('baseUrl:', baseUrl);
@@ -15,11 +18,11 @@
 
 </script>
 
-<NeoThemeProvider>
+<NeoThemeProvider target="self">
   <NeoPortalContainer>
     <NeoSuspense promise={initServices(view)}>
-      <NeoLazy component={import('~/components/header/HeaderComponent.svelte')} />
-      <NeoLazy component={import('~/components/main/MainComponent.svelte')} />
+      <NeoLazy component={import('~/components/header/Header.svelte')} />
+      <NeoLazy component={import('~/components/main/Main.svelte')} />
     </NeoSuspense>
   </NeoPortalContainer>
 </NeoThemeProvider>

@@ -1,9 +1,9 @@
 import type { Route, RouterOptions } from '@dvcol/svelte-simple-router/models';
 
 export const RouteName = {
-  Hello: 'hello',
-  Goodbye: 'goodbye',
   Home: 'home',
+  Feed: 'feed',
+  Settings: 'settings',
   Any: 'any',
 } as const;
 
@@ -14,24 +14,30 @@ export const routes: Readonly<Route<RouteNames>[]> = [
     name: RouteName.Home,
     path: '/',
     redirect: {
-      name: RouteName.Hello,
+      name: RouteName.Feed,
     },
   },
   {
-    name: RouteName.Hello,
-    path: `/${RouteName.Hello}`,
-    component: async () => import('~/components/views/HelloComponent.svelte'),
+    name: RouteName.Feed,
+    path: `/${RouteName.Feed}`,
+    component: async () => import('~/components/views/Feed.svelte'),
+    meta: {
+      index: 1,
+    },
   },
   {
-    name: RouteName.Goodbye,
-    path: `/${RouteName.Goodbye}`,
-    component: async () => import('~/components/views/GoodbyeComponent.svelte'),
+    name: RouteName.Settings,
+    path: `/${RouteName.Settings}`,
+    component: async () => import('~/components/views/Settings.svelte'),
+    meta: {
+      index: 2,
+    },
   },
   {
     name: RouteName.Any,
     path: '*',
     redirect: {
-      name: RouteName.Hello,
+      name: RouteName.Feed,
     },
   },
 ] as const;

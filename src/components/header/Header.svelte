@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { RouteNames } from '~/router/routes';
 
-  import { NeoTab, NeoTabs } from '@dvcol/neo-svelte';
+  import { NeoButtonGroup, NeoTab, NeoTabs, NeoThemeSelector } from '@dvcol/neo-svelte';
   import { resolveComponent } from '@dvcol/svelte-utils';
 
   import { router } from '~/router/router';
@@ -23,11 +23,15 @@
 </script>
 
 <header>
-  <NeoTabs rounded elevation="-2" tag="nav" {active} onchange={onClick}>
+  <NeoTabs rounded elevation={-2} dim tag="nav" {active} onchange={onClick}>
     {#each routes.filter(r => r.path.length > 2) as { name } (name)}
       <NeoTab tabId={name} onpointerenter={() => onHover(name)}>{name}</NeoTab>
     {/each}
   </NeoTabs>
+
+  <NeoButtonGroup rounded elevation={0} borderless>
+    <NeoThemeSelector label={null} rounded />
+  </NeoButtonGroup>
 </header>
 
 <style lang="scss">
@@ -35,5 +39,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
+
+    :global(> *:last-child) {
+      position: absolute;
+      right: 0;
+    }
   }
 </style>
