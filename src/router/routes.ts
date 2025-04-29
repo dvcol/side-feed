@@ -3,6 +3,7 @@ import type { Route, RouterOptions } from '@dvcol/svelte-simple-router/models';
 export const RouteName = {
   Home: 'home',
   Feed: 'feed',
+  Login: 'login',
   Settings: 'settings',
   Any: 'any',
 } as const;
@@ -16,6 +17,11 @@ export const routes: Readonly<Route<RouteNames>[]> = [
     redirect: {
       name: RouteName.Feed,
     },
+  },
+  {
+    name: RouteName.Login,
+    path: `/${RouteName.Login}`,
+    component: async () => import('~/components/views/Login.svelte'),
   },
   {
     name: RouteName.Feed,

@@ -3,7 +3,7 @@
 
   import { useI18n } from '~/utils/i18n.utils';
 
-  const i18n = useI18n('settings');
+  const i18n = useI18n('login');
 </script>
 
 <NeoCard elevation={-2} hover={-1} rounded flex="1 1 auto">

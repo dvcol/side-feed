@@ -6,7 +6,7 @@
   const i18n = useI18n('feed');
 </script>
 
-<NeoCard elevation={0} hover={-2} rounded width="100%">
+<NeoCard elevation={-2} hover={-1} rounded flex="1 1 auto">
   {#snippet header()}
     <h3>{i18n('header')}</h3>
   {/snippet}

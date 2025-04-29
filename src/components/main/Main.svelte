@@ -17,8 +17,8 @@
     in: fly,
     out: fly,
     params: {
-      in: { x: `${direction}%`, duration: 600, easing: sineInOut, opacity: 1 } satisfies FlyParams,
-      out: { x: `${-direction}%`, duration: 600, easing: sineInOut, opacity: 1 } satisfies FlyParams,
+      in: { x: `${direction}%`, duration: 500, easing: sineInOut, opacity: 1 } satisfies FlyParams,
+      out: { x: `${-direction}%`, duration: 500, easing: sineInOut, opacity: 1 } satisfies FlyParams,
     },
     props: {
       container: {
@@ -27,12 +27,16 @@
           flexDirection: 'column',
           flex: '1 1 auto',
           width: '100%',
+          height: '100%',
         },
       },
       wrapper: {
         style: {
           display: 'flex',
+          flexDirection: 'column',
+          flex: '1 1 auto',
           width: '100%',
+          height: '100%',
         },
       },
     },

@@ -40,6 +40,10 @@
     align-items: center;
     justify-content: center;
 
+    :global(> .neo-tabs > nav) {
+      margin-bottom: 0.125rem;
+    }
+
     :global(> *:last-child) {
       position: absolute;
       right: 0;
