@@ -1,5 +1,6 @@
 import type { Manifest } from 'webextension-polyfill';
 
+import { Config } from '@dvcol/feedly-http-client/config';
 import fs from 'fs-extra';
 
 import pkg from '../package.json';
@@ -7,6 +8,7 @@ import { getDirName, isDev, port, resolveParent } from './utils';
 
 const Endpoints = {
   Dev: 'http://localhost' as const,
+  Feedly: Config.Endpoint,
 } as const;
 
 function getExtensionPages(_dev: boolean, _port: number) {
@@ -15,7 +17,9 @@ function getExtensionPages(_dev: boolean, _port: number) {
 }
 
 function getHostPermissions(_dev: boolean, _port: number) {
-  const permissions: Manifest.Permission[] = [];
+  const permissions: Manifest.Permission[] = [
+    `${Endpoints.Feedly}/*`,
+  ];
   if (_dev) permissions.push(`${Endpoints.Dev}:${_port}/*`);
   return permissions;
 }

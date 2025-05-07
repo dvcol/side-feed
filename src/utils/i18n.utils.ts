@@ -1,7 +1,7 @@
 import { chromeI18n, useI18nTranslate } from '@dvcol/web-extension-utils/chrome/i18n';
 
 import { Logger } from '~/services/logger.service';
-import { I18nStore } from '~/stores/i18n-store.svelte';
+import { I18nStore } from '~/stores/i18n.store.svelte.js';
 
 /**
  * Setup i18n function to either use chrome i18n resolver or a local store (for web use).

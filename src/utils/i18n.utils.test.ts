@@ -1,7 +1,7 @@
 import * as Svelte from 'svelte/store';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { I18nStore } from '~/stores/i18n-store.svelte';
+import { I18nStore } from '~/stores/i18n.store.svelte.js';
 import * as I18nUtils from '~/utils/browser/browser-i18n.utils';
 
 import { useI18n } from './i18n.utils';

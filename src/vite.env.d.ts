@@ -14,6 +14,10 @@ interface ImportMetaEnv extends ImportMetaEnv {
   VITE_BASE?: string;
   VITE_WEB?: boolean;
   VITE_SOURCEMAP?: boolean;
+
+  VITE_FEEDLY_CLIENT_ID: string;
+  VITE_FEEDLY_CLIENT_SECRET: string;
+  VITE_FEEDLY_REDIRECT_URI: string;
 };
 
 interface ImportMeta {

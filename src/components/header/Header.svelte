@@ -1,52 +1,41 @@
 <script lang="ts">
-  import type { RouteNames } from '~/router/routes';
-
-  import { NeoButtonGroup, NeoTab, NeoTabs, NeoThemeSelector } from '@dvcol/neo-svelte';
-  import { resolveComponent } from '@dvcol/svelte-utils';
-
-  import { router } from '~/router/router';
-  import { routes } from '~/router/routes';
-
-  const active = $derived(router.route?.name);
-
-  const onClick = (id?: RouteNames) => {
-    if (id === undefined || id === active) return;
-    router.push({ name: id });
-  };
-
-  const onHover = async (id?: RouteNames) => {
-    if (id === undefined || id === active) return;
-    const resolved = await router.resolve({ name: id });
-    if (!resolved?.route) return;
-    return resolveComponent(resolved.route.component);
-  };
+  import HeaderProgress from '~/components/header/HeaderProgress.svelte';
+  import NavBar from '~/components/header/NavBar.svelte';
+  import NavMenu from '~/components/header/NavMenu.svelte';
 </script>
 
-<header>
-  <NeoTabs rounded elevation={-2} dim tag="nav" {active} onchange={onClick}>
-    {#each routes.filter(r => r.path.length > 2) as { name } (name)}
-      <NeoTab tabId={name} onpointerenter={() => onHover(name)}>{name}</NeoTab>
-    {/each}
-  </NeoTabs>
-
-  <NeoButtonGroup rounded elevation={0} borderless>
-    <NeoThemeSelector label={null} rounded />
-  </NeoButtonGroup>
+<header class="header">
+  <div class="header-nav">
+    <NavBar />
+    <NavMenu />
+  </div>
+  <div class="header-progress">
+    <HeaderProgress />
+  </div>
 </header>
 
 <style lang="scss">
-  header {
+  .header {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
 
-    :global(> .neo-tabs > nav) {
-      margin-bottom: 0.125rem;
+    &-nav {
+      display: flex;
+      flex: 1 1 auto;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+
+      :global(> .neo-tabs button.neo-tab-button:disabled) {
+        opacity: 0;
+        pointer-events: none;
+      }
     }
 
-    :global(> *:last-child) {
-      position: absolute;
-      right: 0;
+    &-progress {
+      width: 100%;
+      padding-inline: 0.75rem;
     }
   }
 </style>
