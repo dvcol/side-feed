@@ -30,4 +30,6 @@
 
 </script>
 
-<NeoButton glass rounded onclick={onLogin}>{i18n('button')}</NeoButton>
+<NeoButton glass rounded onclick={onLogin}>
+  {i18n('login', 'buttons')}
+</NeoButton>

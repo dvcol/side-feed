@@ -29,7 +29,7 @@ export async function initServices(options: { option?: boolean; popup?: boolean;
   await FeedStore.init();
 
   // Restore active feed
-  if (FeedStore.active) await FeedlyService.stream({ id: FeedStore.active }, true);
+  if (FeedStore.active) await FeedlyService.stream({ id: FeedStore.active }, { force: true });
 
   if (window) (window as any).FeedlyService = FeedlyService;
   if (window) (window as any).AuthStore = AuthStore;

@@ -1,11 +1,20 @@
 import type { NeoProgressHTMLElement } from '@dvcol/neo-svelte';
 
-import { NeoProgressService } from '@dvcol/neo-svelte';
+import { NeoProgressService, NeoProgressStatus } from '@dvcol/neo-svelte';
 
 import { Logger } from '~/services/logger.service';
 
 export class LoadingService {
   static #progress?: NeoProgressService;
+
+  static get progress() {
+    return this.#progress;
+  }
+
+  static get loading() {
+    if (!this.#progress) return false;
+    return this.#progress.status === NeoProgressStatus.Active || this.#progress.status === NeoProgressStatus.Indeterminate;
+  }
 
   static init(ref: NeoProgressHTMLElement) {
     this.#progress = new NeoProgressService(ref);
