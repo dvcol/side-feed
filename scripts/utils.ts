@@ -2,9 +2,9 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 export const environment = Object.freeze({
-  dev: 'development' as const,
-  prod: 'production' as const,
-});
+  dev: 'development',
+  prod: 'production',
+} as const);
 
 export const getDirName = () => dirname(fileURLToPath(import.meta.url));
 export const isDev: boolean = process.env.NODE_ENV === environment.dev;

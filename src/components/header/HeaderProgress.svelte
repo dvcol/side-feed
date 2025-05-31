@@ -1,9 +1,9 @@
 <script lang="ts">
-  import type { NeoProgressBarProps, NeoProgressHTMLElement } from '@dvcol/neo-svelte';
+  import type { NeoProgressBarProps } from '@dvcol/neo-svelte';
 
   import { NeoProgressBar } from '@dvcol/neo-svelte';
 
-  import { LoadingService } from '~/services/loading.service';
+  import HeaderProgressProvider from '~/components/header/HeaderProgressProvider.svelte';
   import { AuthStore } from '~/stores/authentication.store.svelte';
 
   let {
@@ -11,12 +11,6 @@
     status = $bindable(),
     ...rest
   }: NeoProgressBarProps = $props();
-
-  $effect(() => {
-    if (!ref) return;
-    LoadingService.init(ref as NeoProgressHTMLElement);
-    return () => LoadingService.destroy();
-  });
 </script>
 
 <NeoProgressBar
@@ -26,5 +20,6 @@
   elevation={AuthStore.authenticated ? -2 : 0}
   track={AuthStore.authenticated}
   borderless
+  progress={HeaderProgressProvider}
   {...rest}
 />

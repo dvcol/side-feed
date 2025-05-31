@@ -1,0 +1,26 @@
+{
+  "buttons__refresh": {
+    "message": "Refresh",
+    "description": "Refresh button label"
+  },
+  "buttons__dark_mode": {
+    "message": "Dark mode",
+    "description": "Dark mode button label"
+  },
+  "buttons__light_mode": {
+    "message": "Light mode",
+    "description": "Light mode button label"
+  },
+  "buttons__settings": {
+    "message": "Settings",
+    "description": "Settings button label"
+  },
+  "buttons__login": {
+    "message": "Login",
+    "description": "Login button label"
+  },
+  "buttons__logout": {
+    "message": "Logout",
+    "description": "Logout button label"
+  }
+}

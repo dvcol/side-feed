@@ -43,7 +43,7 @@
         class: 'main-transition-wrapper',
       },
     },
-    skipFirst: false,
+    first: false,
   });
 
 </script>

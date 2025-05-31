@@ -1,8 +1,9 @@
 <script lang="ts">
   import type { NeoMenuItem } from '@dvcol/neo-svelte';
 
-  import { NeoButton, NeoButtonGroup, NeoIconCog, NeoIconRefresh, NeoIconTheme, NeoIconUnplug, NeoMenu, NeoTheme, useNeoThemeContext } from '@dvcol/neo-svelte';
+  import { NeoButton, NeoButtonGroup, NeoIconCog, NeoIconTheme, NeoIconUnplug, NeoMenu, NeoTheme, useNeoThemeContext } from '@dvcol/neo-svelte';
 
+  import IconRefresh from '~/components/icons/IconRefresh.svelte';
   import { router } from '~/router/router';
   import { RouteName } from '~/router/routes';
   import { FeedlyService } from '~/services/feedly.service';
@@ -22,7 +23,7 @@
 
   const onRefresh = async () => {
     if (FeedStore.active === undefined) return;
-    await FeedlyService.stream({ id: FeedStore.active }, true);
+    await FeedlyService.stream({ id: FeedStore.active }, { force: true });
   };
 
   const items: NeoMenuItem[] = [
@@ -32,9 +33,9 @@
       section: true,
       sticky: true,
       items: [
-        { label: i18n('refresh', 'button'), onclick: onRefresh, keepOpenOnSelect: true, before: NeoIconRefresh },
-        { label: i18n(`${context.theme}_mode`, 'button'), onclick: onTheme, keepOpenOnSelect: true, before: NeoIconTheme },
-        { label: i18n('settings', 'button'), onclick: () => router.push({ name: RouteName.Settings }), before: NeoIconCog },
+        { label: i18n('refresh', 'buttons'), onclick: onRefresh, keepOpenOnSelect: true, before: IconRefresh },
+        { label: i18n('settings', 'buttons'), onclick: () => router.push({ name: RouteName.Settings }), before: NeoIconCog },
+        { label: i18n(`${context.theme}_mode`, 'buttons'), onclick: onTheme, keepOpenOnSelect: true, before: NeoIconTheme },
       ],
     },
     {
@@ -43,15 +44,20 @@
       section: true,
       sticky: true,
       items: [
-        { label: i18n('logout', 'button'), onclick: FeedlyService.logout, keepOpenOnSelect: true, before: NeoIconUnplug },
+        { label: i18n('logout', 'buttons'), onclick: FeedlyService.logout, keepOpenOnSelect: true, before: NeoIconUnplug },
       ],
     },
   ];
 </script>
 
-<NeoButtonGroup rounded elevation={0} borderless>
+<NeoButtonGroup rounded elevation={0} borderless --neo-btn-group-gap="0">
+  <NeoButton onclick={onRefresh}>
+    {#snippet icon()}
+      <IconRefresh />
+    {/snippet}
+  </NeoButton>
   {#if AuthStore.profile}
-    <NeoMenu keepOpenOnHover {items} placement="bottom-end" reverse disabled={!AuthStore.authenticated}>
+    <NeoMenu {items} placement="bottom-end" reverse disabled={!AuthStore.authenticated} blur="5">
       <NeoButton onclick={onClick} reverse {checked} style="min-width: max-content;">
         {AuthStore.profile.givenName}
         {#snippet icon()}

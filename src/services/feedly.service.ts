@@ -1,23 +1,103 @@
-import type { FeedlyApiResponse, FeedlyClientAuthentication, FeedlyCollection, FeedlyCollectionRequest, FeedlyProfile, FeedlyStream, FeedlyStreamRequest } from '@dvcol/feedly-http-client/models';
+import type { FeedlyApiResponse, FeedlyClientAuthentication, FeedlyCollection, FeedlyCollectionRequest, FeedlyEntry, FeedlyProfile, FeedlyStream, FeedlyStreamRequest, FeedlyVisual } from '@dvcol/feedly-http-client/models';
 
-import type { FeedEntry } from '~/models/feed.model';
+import type { FeedEntry, FeedMedia, FeedUpdate } from '~/models/feed.model';
 
 import { CacheRetention } from '@dvcol/common-utils/common/cache';
+import { timeAgo } from '@dvcol/common-utils/common/date';
 import { FeedlyClient } from '@dvcol/feedly-http-client';
 import { feedly } from '@dvcol/feedly-http-client/api';
 import { Config } from '@dvcol/feedly-http-client/config';
 import { chromeRuntimeId } from '@dvcol/web-extension-utils/chrome/runtime';
 import { createTab, tabs } from '@dvcol/web-extension-utils/chrome/tabs';
+import { SvelteMap } from 'svelte/reactivity';
 
 import { MessageType } from '~/models/message.model';
 import { StorageKey } from '~/models/storage.model';
-import { LoadingService } from '~/services/loading.service';
+import { LoadingService } from '~/services/loading.service.svelte';
 import { Logger } from '~/services/logger.service';
 import { AuthStore } from '~/stores/authentication.store.svelte';
 import { FeedStore } from '~/stores/feed.store.svelte';
 import { sendMessage } from '~/utils/browser/browser-message.utils';
 import { storage } from '~/utils/browser/browser-storage.utils';
 import { HTTpChromeCacheStore } from '~/utils/cache.utils';
+
+function alternateToUrl(alternate?: FeedlyEntry['alternate']): string | undefined {
+  if (!alternate) return;
+  return alternate?.find(i => i.href)?.href;
+}
+
+function visualToMedia(visual?: FeedlyVisual, alt?: string): FeedMedia | undefined {
+  if (!visual) return undefined;
+  const { url } = visual;
+  if (!url) return undefined;
+  return { type: 'image', image: { alt, src: url } };
+}
+
+function enclosureToMedia(enclosure?: FeedlyEntry['enclosure'], alt?: string): FeedMedia | undefined {
+  if (!enclosure) return undefined;
+  const { href } = enclosure?.find(i => i.href) ?? {};
+  if (!href) return undefined;
+  return { type: 'image', image: { alt, src: href } };
+}
+
+function getFavicon(url?: string): string | undefined {
+  if (!url) return;
+  try {
+    return `https://www.google.com/s2/favicons?sz=16&domain=${new URL(url).hostname}`;
+  } catch (e) {
+    Logger.error('Failed to get favicon', e);
+  }
+}
+
+const alphaNumericRegex = /[^a-z0-9\s]/i;
+function getTags({
+  origin,
+  published,
+  engagement,
+}: Pick<FeedlyEntry, 'origin' | 'published' | 'engagement'>): FeedEntry['tags'] {
+  const tags: FeedEntry['tags'] = [];
+  if (origin?.title) tags.push({
+    label: origin.title?.trim()?.split(alphaNumericRegex)?.at(0)?.trim(),
+    color: 'var(--neo-color-secondary)',
+    icon: getFavicon(origin?.htmlUrl),
+  });
+  if (engagement) {
+    tags.push('/');
+    let color: string | undefined;
+    if (engagement > 100) color = 'var(--neo-color-error)';
+    else if (engagement > 50) color = 'var(--neo-color-warning)';
+    tags.push({ label: engagement.toString(), color });
+  }
+  if (published) tags.push('/', timeAgo(published));
+  return tags;
+}
+
+function streamToFeed(stream: FeedlyStream): FeedUpdate {
+  return {
+    id: stream.id,
+    entries: stream.items.map(
+      ({ id, title, summary, canonicalUrl, visual, enclosure, alternate, origin, published, unread, engagement }, i) => ({
+        id,
+        label: title ?? id,
+        description: summary?.content,
+        media: visualToMedia(visual, `Visual for ${id ?? i}`) || enclosureToMedia(enclosure, `Visual for ${id ?? i}`),
+        tags: getTags({ origin, published, engagement }),
+        read: !unread,
+        timestamp: published,
+        href: canonicalUrl || alternateToUrl(alternate),
+        onclick: async (e) => {
+          const url = canonicalUrl || alternateToUrl(alternate);
+          if (!url) return;
+          e.preventDefault();
+          return tabs?.update({ active: true, url });
+        },
+      } satisfies FeedEntry),
+    ),
+    next: !!stream.continuation,
+  };
+}
+
+const streamPagination = new SvelteMap<FeedlyStream['id'], FeedlyStream['continuation']>();
 
 export class FeedlyService {
   static #cache = new HTTpChromeCacheStore<FeedlyApiResponse>({ prefix: 'feedly', retention: CacheRetention.Day });
@@ -102,11 +182,19 @@ export class FeedlyService {
     return collections;
   }
 
-  static async stream({ id, ...request }: FeedlyStreamRequest, force = false): Promise<FeedlyStream> {
+  static async stream({ id, ...request }: FeedlyStreamRequest, { force = false, next = false }: { force?: boolean; next?: boolean } = {}): Promise<FeedlyStream> {
     FeedStore.load(id);
-    const response: FeedlyApiResponse<FeedlyStream> = await this.#client.streams.contents.cached({ id, count: 100, ...request }, undefined, { force });
+    const query = {
+      id,
+      count: FeedStore.pagination,
+      ranked: 'newest',
+      continuation: (next ? streamPagination.get(id) : undefined),
+      ...request,
+    } satisfies FeedlyStreamRequest;
+    const response: FeedlyApiResponse<FeedlyStream> = await this.#client.streams.contents.cached(query, undefined, { force });
     const stream = await response.json();
-    FeedStore.update({ id: stream.id, entries: stream.items.map(({ id, title, summary, canonicalUrl }) => ({ id, label: title ?? id, description: summary?.content, href: canonicalUrl } satisfies FeedEntry)) });
+    streamPagination.set(id, stream.continuation);
+    FeedStore.update(streamToFeed(stream), next);
     FeedStore.loaded(id);
     return stream;
   }
